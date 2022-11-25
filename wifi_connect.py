@@ -14,7 +14,7 @@ HOST = ''           # 使用第一个可用的端口
 PORT = 8080         # 任意非特权端口
 
 #黑色点阈值
-red_threshold = [(44, 72, 23, 38, -5, 19)]
+red_threshold = [(75, 100, -80, 10, -8, 62)]
 #xy平面误差数据
 err_x = 0
 err_y = 0
@@ -92,8 +92,8 @@ def start_streaming(s):
                     most_pixels = blobs[i].pixels()
                     largest_blob = i
                     #位置环用到的变量
-                    err_x = int(60 - blobs[largest_blob].cy())
-                    err_y = int(blobs[largest_blob].cx() - 80)
+                    err_x = int(blobs[largest_blob].cy())
+                    err_y = int(blobs[largest_blob].cx())
             img.draw_cross(blobs[largest_blob].cx(),blobs[largest_blob].cy())#调试使用
             img.draw_rectangle(blobs[largest_blob].rect())
         else:
@@ -101,7 +101,7 @@ def start_streaming(s):
             err_x = 0
             err_y = 0
         #数组中数据写入
-        uart_buf = bytearray([0x55,err_x,err_y,err_x + err_y])
+        uart_buf = bytearray([0xA5,0x5A,err_x,err_y,err_x + err_y])
         print(err_x,err_y)
         uart.write(uart_buf)
         print(clock.fps())
@@ -116,5 +116,5 @@ while (True):
     # 设置服务器套接字超时
     # 注意：由于WINC FW bug，如果客户端断开连接，服务器套接字必须
     # 关闭并重新打开。在这里使用超时关闭并重新创建套接字。
-    s.settimeout(100)
+    s.settimeout(1000)
     start_streaming(s)
